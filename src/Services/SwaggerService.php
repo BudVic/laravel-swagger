@@ -456,6 +456,14 @@ class SwaggerService
                 $data['required'][] = $parameter;
             }
 
+            array_walk($rulesArray, function (&$rule) {
+                if ($rule instanceof \Illuminate\Contracts\Validation\Rule) {
+                    $className = get_class($rule);
+                    $classNameWithoutNamespace = substr($className, strrpos($className, '\\') + 1);
+                    $rule = strtolower(preg_replace('/Rule$/', '', $classNameWithoutNamespace));
+                }
+            });
+
             $rulesArray = array_flip(array_diff_key(array_flip($rulesArray), $uselessRules));
 
             $this->saveParameterDescription($data, $parameter, $rulesArray, $attributes, $annotations);
